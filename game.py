@@ -1,6 +1,7 @@
 board = ["-"] * 9
 xMoves = []
 oMoves = []
+legalMoves = {0, 1, 2, 3, 4, 5, 6, 7, 8}
 turnTracker = "X"  # whose turn it is
 winConditions = [
     # horizontal
@@ -28,8 +29,9 @@ def makeMove():
     print()
 
     # register move to the board
-    if board[move] == "-" and move in range(8):
+    if move in legalMoves:
         board[move] = turnTracker
+        legalMoves.remove(move)
         return move
     else:
         print("Illegal move. Try again.")

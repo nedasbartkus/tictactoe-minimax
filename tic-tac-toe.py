@@ -27,11 +27,20 @@ turnTracker = "X"  # whose turn it is
 while True:
     printBoard()
 
-    move = int(input(turnTracker + " to move: "))
-    print()
+    legalMove = False
+    while not legalMove:
+        move = int(input(turnTracker + " to move: "))
+        print()
 
-    # register move to the board and individual move list
-    board[move] = turnTracker
+        # register move to the board
+        if board[move] == "-" and move in range(8):
+            board[move] = turnTracker
+            legalMove = True
+        else:
+            print("Illegal move. Try again.")
+            printBoard()
+
+    # register move to individual move list
     if turnTracker == "X":
         xMoves.append(move)
     else:

@@ -35,67 +35,60 @@ class GameState:  # tree node
             nextToMove = "X"
 
 
-# initialize all nodes (generate gamestates)
-def initializeTree(rootState):
+global counter
+counter = 0
+
+
+# initialize subsequent gamestates
+def initializeChildNodes(rootState):
+    global counter
     if not rootState.openMoves:
         return
 
-    tempOpenMoves = rootState.openMoves.copy()
-    tempxPlayed = rootState.xPlayed.copy()
-    tempoPlayed = rootState.oPlayed.copy()
+    for move in rootState.openMoves:
+        counter += 1
+        passOpenMoves = rootState.openMoves.copy()
+        passxPlayed = rootState.xPlayed.copy()
+        passoPlayed = rootState.oPlayed.copy()
+        passNextToMove = None
 
-    if rootState.nextToMove == "X":
-        # make a quick copy of the list WITHIN the for loop definition (sneaky sneaky)
-        for move in list(rootState.openMoves):
-            print("open moves: ", rootState.openMoves)
-            print()
-            print("move: ", move)
+        passOpenMoves.remove(move)
 
-            passxPlayed = tempxPlayed.copy()
-            passOpenMoves = tempOpenMoves.copy()
-
+        if rootState.nextToMove == "X":
             passxPlayed.append(move)
-            passOpenMoves.remove(move)
-
-            rootState.children.append(
-                GameState(
-                    rootState,
-                    None,
-                    None,
-                    passOpenMoves,
-                    passxPlayed,
-                    rootState.oPlayed,
-                    "O",
-                )
-            )
-    else:
-        for move in list(rootState.openMoves):
-            print("open moves: ", rootState.openMoves)
-            print()
-            print("move: ", move)
-
-            passoPlayed = tempoPlayed.copy()
-            passOpenMoves = tempOpenMoves.copy()
-
+            passNextToMove = "O"
+        else:
             passoPlayed.append(move)
-            passOpenMoves.remove(move)
+            passNextToMove = "X"
 
-            rootState.children.append(
-                GameState(
-                    rootState,
-                    None,
-                    None,
-                    passOpenMoves,
-                    rootState.xPlayed,
-                    passoPlayed,
-                    "X",
-                )
+        rootState.children.append(
+            GameState(
+                rootState,
+                [],
+                None,
+                passOpenMoves,
+                passxPlayed,
+                passoPlayed,
+                passNextToMove,
             )
+        )
+
+    for child in rootState.children:
+        initializeChildNodes(child)
+
+
+# def calculateUtilityValue(rootState):
 
 
 print(
-    initializeTree(GameState(None, [], None, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X"))
+    initializeChildNodes(
+        GameState(None, [], None, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X")
+    )
 )
+
+print(counter)
+
+
 # def minimax(legalMoves, GameState):
 #     childUtilityValues = []
 #     for child in GameState.getAllChildren():

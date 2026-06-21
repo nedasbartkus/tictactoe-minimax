@@ -51,21 +51,19 @@ def initializeTree(rootState):
             print()
             print("move: ", move)
 
-            passxPlayed = tempxPlayed
-            passOpenMoves = tempOpenMoves
+            passxPlayed = tempxPlayed.copy()
+            passOpenMoves = tempOpenMoves.copy()
 
             passxPlayed.append(move)
             passOpenMoves.remove(move)
 
-            rootState.xPlayed.append(move)
-            rootState.openMoves.remove(move)
             rootState.children.append(
                 GameState(
                     rootState,
                     None,
                     None,
                     passOpenMoves,
-                    rootState.xPlayed,
+                    passxPlayed,
                     rootState.oPlayed,
                     "O",
                 )
@@ -76,23 +74,21 @@ def initializeTree(rootState):
             print()
             print("move: ", move)
 
-            passoPlayed = tempoPlayed
-            passOpenMoves = tempOpenMoves
+            passoPlayed = tempoPlayed.copy()
+            passOpenMoves = tempOpenMoves.copy()
 
             passoPlayed.append(move)
             passOpenMoves.remove(move)
 
-            rootState.oPlayed.append(move)
-            rootState.openMoves.remove(move)
             rootState.children.append(
                 GameState(
                     rootState,
                     None,
                     None,
-                    rootState.openMoves,
+                    passOpenMoves,
                     rootState.xPlayed,
-                    rootState.oPlayed,
-                    "O",
+                    passoPlayed,
+                    "X",
                 )
             )
 

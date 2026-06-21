@@ -40,6 +40,7 @@ counter = 0
 
 
 # initialize subsequent gamestates
+# sum of all game states = sum(i = 0 to 9, (9! / (9-depth)!) )
 def initializeChildNodes(rootState):
     global counter
     if not rootState.openMoves:

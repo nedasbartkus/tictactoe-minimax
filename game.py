@@ -1,3 +1,5 @@
+import minimax
+
 board = ["-"] * 9
 xMoves = []
 oMoves = []
@@ -38,6 +40,16 @@ def makeMove():
         makeMove()
 
 
+def botMove(rootNode):
+    # printBoard()
+    move = minimax.chooseMove(rootNode)
+    print()
+
+    board[move] = turnTracker
+    legalMoves.remove(move)
+    return move
+
+
 def registerMove(move):
     if turnTracker == "X":
         xMoves.append(move)
@@ -46,6 +58,11 @@ def registerMove(move):
 
 
 def checkForWinstate():
+    if not legalMoves:
+        printBoard()
+        print("Draw...")
+        exit()
+
     for condition in winConditions:
         if all(pos in xMoves for pos in condition):
             printBoard()
@@ -64,16 +81,35 @@ def changeTurn(turnTracker):
         return "X"
 
 
+# minimax.rootNode = minimax.GameState(
+#     None, [], 0, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X", None
+# )
+rootNode = minimax.rootNode
+
 # gameplay loop
 while True:
-    # one of the players is prompted to make a move
+    # player move
     move = makeMove()
 
-    # register move to individual move list
     registerMove(move)
 
-    # check if there is a win on the board
     checkForWinstate()
 
-    # switch whose move it is
     turnTracker = changeTurn(turnTracker)
+
+    # now its minimax time B)
+    for child in rootNode.children:
+        if child.lastMove == move:
+            rootNode = child
+
+    move = botMove(rootNode)
+
+    registerMove(move)
+
+    checkForWinstate()
+
+    turnTracker = changeTurn(turnTracker)
+
+    for child in rootNode.children:
+        if child.lastMove == move:
+            rootNode = child

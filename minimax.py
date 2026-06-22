@@ -135,10 +135,10 @@ def chooseMove(currentNode):
         for child in currentNode.children:
             if child.utilityValue == minUtility:
                 return child.lastMove
+    return -1
 
 
 rootNode = GameState(None, [], 0, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X", None)
 
 initializeGameTree(rootNode)
 calculateUtilityValues(rootNode)
-print(chooseMove(rootNode))

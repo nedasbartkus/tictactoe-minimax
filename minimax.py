@@ -22,7 +22,15 @@ def checkForWinstate(moveList):
 
 class GameState:  # tree node
     def __init__(
-        self, parent, children, utilityValue, openMoves, xPlayed, oPlayed, player
+        self,
+        parent,
+        children,
+        utilityValue,
+        openMoves,
+        xPlayed,
+        oPlayed,
+        player,
+        lastMove,
     ):
         self.parent = parent
         self.children = children
@@ -31,6 +39,7 @@ class GameState:  # tree node
         self.xPlayed = xPlayed
         self.oPlayed = oPlayed
         self.player = player
+        self.lastMove = lastMove
 
     def getAllChildren(self, children):
         allChildren = []
@@ -71,6 +80,7 @@ def initializeGameTree(rootState):
                 passxPlayed,
                 passoPlayed,
                 passPlayer,
+                move,
             )
         )
 
@@ -105,13 +115,30 @@ def calculateUtilityValues(currentNode):
         return oWants
 
 
-def minimax(legalMoves, GameState):
-    childUtilityValues = []
-    for child in GameState.getAllChildren():
-        childUtilityValues.append(minimax(GameState.children[child]))
+def chooseMove(currentNode):
+    childrenUtilityValues = []
+    maxUtility = None
+    minUtility = None
+
+    for child in currentNode.children:
+        childrenUtilityValues.append(child.utilityValue)
+
+    for child in currentNode.children:
+        maxUtility = max(childrenUtilityValues)
+        minUtility = min(childrenUtilityValues)
+
+    if currentNode.player == "X":
+        for child in currentNode.children:
+            if child.utilityValue == maxUtility:
+                return child.lastMove
+    else:
+        for child in currentNode.children:
+            if child.utilityValue == minUtility:
+                return child.lastMove
 
 
-rootNode = GameState(None, [], 0, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X")
+rootNode = GameState(None, [], 0, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X", None)
 
 initializeGameTree(rootNode)
 calculateUtilityValues(rootNode)
+print(chooseMove(rootNode))

@@ -1,18 +1,28 @@
-# minimax algorithm
-# current state
-# all next states
-# continue computing all next states until terminal state is reached
-# assign value to each terminal state
-#
-# then its just minimax algorithm as i know it:
-# for max: choose path w/ higher number
-# for min: choose path w/ lower number
-# what heuristic? try: how many possible wins does this route have?
+winConditions = [
+    # horizontal
+    (0, 1, 2),
+    (3, 4, 5),
+    (6, 7, 8),
+    # vertical
+    (0, 3, 6),
+    (1, 4, 7),
+    (2, 5, 8),
+    # diagonal
+    (0, 4, 8),
+    (2, 4, 6),
+]
+
+
+def checkForWinstate(moveList):
+    for condition in winConditions:
+        if all(pos in moveList for pos in condition):
+            return True
+    return False
 
 
 class GameState:  # tree node
     def __init__(
-        self, parent, children, utilityValue, openMoves, xPlayed, oPlayed, nextToMove
+        self, parent, children, utilityValue, openMoves, xPlayed, oPlayed, player
     ):
         self.parent = parent
         self.children = children
@@ -20,7 +30,7 @@ class GameState:  # tree node
         self.openMoves = openMoves
         self.xPlayed = xPlayed
         self.oPlayed = oPlayed
-        self.nextToMove = nextToMove
+        self.player = player
 
     def getAllChildren(self, children):
         allChildren = []
@@ -28,69 +38,80 @@ class GameState:  # tree node
             allChildren.append(child)
         return allChildren
 
-    def changeTurn(self, nextToMove):
-        if nextToMove == "X":
-            nextToMove = "O"
-        else:
-            nextToMove = "X"
 
-
-global counter
-counter = 0
-
-
-# initialize subsequent gamestates
+# initialize all possible (and sometimes impossible) gamestates
 # sum of all game states = sum(i = 0 to 9, (9! / (9-depth)!) )
-def initializeChildNodes(rootState):
-    global counter
+def initializeGameTree(rootState):
+    # global counter
     if not rootState.openMoves:
         return
 
     for move in rootState.openMoves:
-        counter += 1
+        # counter += 1
         passOpenMoves = rootState.openMoves.copy()
         passxPlayed = rootState.xPlayed.copy()
         passoPlayed = rootState.oPlayed.copy()
-        passNextToMove = None
+        passPlayer = None
 
         passOpenMoves.remove(move)
 
-        if rootState.nextToMove == "X":
+        if rootState.player == "X":
             passxPlayed.append(move)
-            passNextToMove = "O"
+            passPlayer = "O"
         else:
             passoPlayed.append(move)
-            passNextToMove = "X"
+            passPlayer = "X"
 
         rootState.children.append(
             GameState(
                 rootState,
                 [],
-                None,
+                0,
                 passOpenMoves,
                 passxPlayed,
                 passoPlayed,
-                passNextToMove,
+                passPlayer,
             )
         )
 
     for child in rootState.children:
-        initializeChildNodes(child)
+        initializeGameTree(child)
 
 
-# def calculateUtilityValue(rootState):
+def calculateUtilityValues(currentNode):
+    # check for winstate or draw
+    if checkForWinstate(currentNode.xPlayed):
+        currentNode.utilityValue = 1
+        return 1  # 1 means the node is an x win
+    elif checkForWinstate(currentNode.oPlayed):
+        currentNode.utilityValue = -1
+        return -1  # -1 means the node is an O win
+    elif not currentNode.openMoves:
+        currentNode.utilityValue = 0
+        return 0  # 0 means draw
+
+    childrenUtilityValues = []
+
+    for child in currentNode.children:
+        childrenUtilityValues.append(calculateUtilityValues(child))
+
+    if currentNode.player == "X":
+        xWants = max(childrenUtilityValues)
+        currentNode.utilityValue = xWants
+        return xWants
+    elif currentNode.player == "O":
+        oWants = min(childrenUtilityValues)
+        currentNode.utilityValue = oWants
+        return oWants
 
 
-print(
-    initializeChildNodes(
-        GameState(None, [], None, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X")
-    )
-)
-
-print(counter)
+def minimax(legalMoves, GameState):
+    childUtilityValues = []
+    for child in GameState.getAllChildren():
+        childUtilityValues.append(minimax(GameState.children[child]))
 
 
-# def minimax(legalMoves, GameState):
-#     childUtilityValues = []
-#     for child in GameState.getAllChildren():
-#         childUtilityValues.append(minimax(GameState.children[child]))
+rootNode = GameState(None, [], 0, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X")
+
+initializeGameTree(rootNode)
+calculateUtilityValues(rootNode)

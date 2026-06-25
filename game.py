@@ -37,7 +37,7 @@ def makeMove():
         return move
     else:
         print("Illegal move. Try again.")
-        makeMove()
+        return makeMove()
 
 
 def botMove(rootNode):

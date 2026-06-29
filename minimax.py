@@ -1,3 +1,5 @@
+import time
+
 winConditions = [
     # horizontal
     (0, 1, 2),
@@ -140,5 +142,10 @@ def chooseMove(currentNode):
 
 rootNode = GameState(None, [], 0, [0, 1, 2, 3, 4, 5, 6, 7, 8], [], [], "X", None)
 
+
+start_time = time.time()
 initializeGameTree(rootNode)
+
+print("--- %s seconds ---" % (time.time() - start_time))
+
 calculateUtilityValues(rootNode)
